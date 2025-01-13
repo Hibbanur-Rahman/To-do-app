@@ -1,118 +1,136 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, {useEffect, useState} from 'react';
+import {SafeAreaView, StyleSheet} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {Provider, useDispatch, useSelector} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {enableScreens} from 'react-native-screens';
+import tw from 'twrnc';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import store from './src/redux/store';
+import {handleIsAuthenticated} from './src/redux/slices/authSlice';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import Home from './src/screens/home';
+import Login from './src/screens/login';
+import Register from './src/screens/register';
+import StartScreen from './src/screens/startScreen';
+import BottomNavbar from './src/components/bottomNavbar';
+import Layout from './src/screens/layout';
+import Profile from './src/screens/profile';
+import AddTask from './src/screens/addTask';
+// Enable react-native-screens for better performance
+enableScreens();
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+// Define navigation types
+export type RootStackParamList = {
+  Home: undefined;
+  Profile: undefined;
+  EditProfile: undefined;
+  Offers: undefined;
+  Pharmacy: undefined;
+  Doctors: undefined;
+  UploadPrescription:undefined;
+  TermsAndCondition: undefined;
+  PrivacyPolicy: undefined;
+  Login: undefined;
+  Register: undefined;
+  StartScreen: undefined;
+  Layout: undefined;
+  AddTask:undefined;
+};
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+function AppContent() {
+  const dispatch = useDispatch();
+  const [authInitialRouteName, setAuthInitialRouteName] = useState<
+    keyof RootStackParamList | undefined
+  >(undefined);
+
+  const isAuthenticated = useSelector(
+    (state: any) => state.auth.isAuthenticated,
+  );
+
+  // Handle token fetch
+  const handleFetchToken = async () => {
+    try {
+      const storedToken = await AsyncStorage.getItem('access_token');
+      if (storedToken) {
+        dispatch(handleIsAuthenticated({isAuthenticated: true}));
+        setAuthInitialRouteName('Layout');
+      } else {
+        dispatch(handleIsAuthenticated({isAuthenticated: false}));
+        setAuthInitialRouteName('StartScreen');
+      }
+    } catch (error) {
+      console.error('Error fetching token:', error);
+      setAuthInitialRouteName('StartScreen');
+    }
+  };
+
+  useEffect(() => {
+    handleFetchToken();
+  }, []);
+
+  useEffect(() => {
+    setAuthInitialRouteName(isAuthenticated ? 'Layout' : 'StartScreen');
+  }, [isAuthenticated]);
+
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+    <NavigationContainer>
+      <SafeAreaView style={tw`flex-1 bg-white`}>
+        {authInitialRouteName && (
+          <Stack.Navigator initialRouteName={authInitialRouteName}>
+             <Stack.Screen
+              name="StartScreen"
+              component={StartScreen}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="Layout"
+              component={Layout}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="Home"
+              component={Home}
+              options={{headerShown: false}}
+            />
+            
+            <Stack.Screen
+              name="AddTask"
+              component={AddTask}
+              options={{headerShown: false}}
+            />
+            
+            <Stack.Screen
+              name="Login"
+              component={Login}
+              options={{headerShown: false}}
+            />
+
+            <Stack.Screen
+              name="Register"
+              component={Register}
+              options={{headerShown: false}}
+            />
+          </Stack.Navigator>
+        )}
+      </SafeAreaView>
+    </NavigationContainer>
   );
 }
 
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <Provider store={store}>
+      <AppContent />
+    </Provider>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
+  // Add styles if needed later
 });
 
 export default App;
