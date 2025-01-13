@@ -7,6 +7,7 @@ import ArrowDownSvg from './arrowDownSvg';
 import tw from 'twrnc';
 const data = [
   {label: 'Office Project', value: 'office-project'},
+  {label: 'Personal Project', value: 'personal-project'},
   {label: 'work', value: 'work'},
   {label: 'study', value: 'study'},
   {label: 'gym', value: 'gym'},

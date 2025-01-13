@@ -10,6 +10,7 @@ import {
   FlatList,
   Animated,
   ImageBackground,
+  Alert,
 } from 'react-native';
 import tw from 'twrnc';
 // import ProfileImg from '../assets/images/profile.png';
@@ -30,12 +31,120 @@ import Icon from 'react-native-vector-icons/Octicons';
 import IconIntypo from 'react-native-vector-icons/Entypo';
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome6';
 import CircularProgress from '../components/circularProgress';
+import {useDispatch} from 'react-redux';
+import {handleSetActiveTaskGroup} from '../redux/slices/taskSlice';
+import axios from 'axios';
+import API_URL from '../../environmentVariables';
+import {tags} from 'react-native-svg/lib/typescript/xmlTags';
 
 const Home = () => {
   const [username, setUsername] = useState('');
+  const dispatch = useDispatch();
+  const [taskList, setTaskList] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [category, setCategory] = useState({
+    officeProject: {
+      label: 'office-project',
+      count: 0,
+    },
+    personalProject: {
+      label: 'personal-project',
+      count: 0,
+    },
+    work: {
+      label: 'work',
+      count: 0,
+    },
+    study: {
+      label: 'study',
+      count: 0,
+    },
+    gym: {
+      label: 'gym',
+      count: 0,
+    },
+    other: {
+      label: 'other',
+      count: 0,
+    },
+  });
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
+  const handleGroupTaskNavigate = (groupName: any) => {
+    console.log('groupName:', groupName);
+    dispatch(handleSetActiveTaskGroup({groupName}));
+    navigation.navigate('TaskList');
+  };
+
+  const handleTaskList = async () => {
+    const token = await AsyncStorage.getItem('access_token');
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API_URL}/tasks`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response?.status === 200) {
+        const taskList = response?.data?.data;
+        const categoryCount = {
+          officeProject: {
+            label: 'office-project',
+            count: 0,
+          },
+          personalProject: {
+            label: 'personal-project',
+            count: 0,
+          },
+          work: {
+            label: 'work',
+            count: 0,
+          },
+          study: {
+            label: 'study',
+            count: 0,
+          },
+          gym: {
+            label: 'gym',
+            count: 0,
+          },
+          other: {
+            label: 'other',
+            count: 0,
+          },
+        };
+        taskList.map(item => {
+          const tag = item?.tags;
+          if (tag) {
+            const categoryKey = Object.keys(categoryCount).find(
+              key => categoryCount[key].label === tag,
+            );
+            if (categoryKey) {
+              categoryCount[categoryKey].count += 1;
+            }
+          }
+        });
+
+        setCategory(categoryCount);
+        console.log('taskList:', taskList);
+        setTaskList(response?.data?.data);
+      }
+    } catch (error) {
+      console.log('error:', error);
+      Alert.alert(
+        'Error',
+        `${error?.response?.data?.message || 'Failed to fetch task list.'}`,
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    handleTaskList();
+  }, []);
   useEffect(() => {
     const fetchName = async () => {
       try {
@@ -313,7 +422,11 @@ const Home = () => {
             {/** =============== Task Groups section ============== */}
             <View>
               <Text style={styles.progressHeadText}>Task Groups</Text>
-              <TouchableOpacity style={[styles.taskGroupCard, {}]}   onPress={() => navigation.navigate('TaskList')}>
+              <TouchableOpacity
+                style={[styles.taskGroupCard, tw`rounded-2xl shadow-sm border border-gray-100`]}
+                onPress={() => {
+                  handleGroupTaskNavigate('office-project');
+                }}>
                 <View style={{display: 'flex', flexDirection: 'row'}}>
                   <View
                     style={{
@@ -332,7 +445,9 @@ const Home = () => {
                     <Text style={styles.taskGroupCardHeadText}>
                       Office Project
                     </Text>
-                    <Text style={styles.taskGroupCardParaText}>23 Tasks</Text>
+                    <Text style={styles.taskGroupCardParaText}>
+                      {category?.officeProject?.count || 0} Tasks
+                    </Text>
                   </View>
                 </View>
                 <CircularProgress
@@ -346,7 +461,11 @@ const Home = () => {
                   fontColor="#000"
                 />
               </TouchableOpacity>
-              <View style={[styles.taskGroupCard, {}]}>
+              <TouchableOpacity
+                style={[styles.taskGroupCard, tw`rounded-2xl shadow-sm border border-gray-100`]}
+                onPress={() => {
+                  handleGroupTaskNavigate('personal-project');
+                }}>
                 <View style={{display: 'flex', flexDirection: 'row'}}>
                   <View
                     style={{
@@ -365,7 +484,9 @@ const Home = () => {
                     <Text style={styles.taskGroupCardHeadText}>
                       Personal Project
                     </Text>
-                    <Text style={styles.taskGroupCardParaText}>30 Tasks</Text>
+                    <Text style={styles.taskGroupCardParaText}>
+                      {category?.personalProject?.count || 0} Tasks
+                    </Text>
                   </View>
                 </View>
                 <CircularProgress
@@ -378,8 +499,12 @@ const Home = () => {
                   fontSize={12}
                   fontColor="#000"
                 />
-              </View>
-              <View style={[styles.taskGroupCard, {}]}>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.taskGroupCard, tw`rounded-2xl shadow-sm border border-gray-100`]}
+                onPress={() => {
+                  handleGroupTaskNavigate('study');
+                }}>
                 <View style={{display: 'flex', flexDirection: 'row'}}>
                   <View
                     style={{
@@ -398,7 +523,9 @@ const Home = () => {
                     <Text style={styles.taskGroupCardHeadText}>
                       Daily Study
                     </Text>
-                    <Text style={styles.taskGroupCardParaText}>18 Tasks</Text>
+                    <Text style={styles.taskGroupCardParaText}>
+                      {category?.study?.count || 0} Tasks
+                    </Text>
                   </View>
                 </View>
                 <CircularProgress
@@ -411,9 +538,13 @@ const Home = () => {
                   fontSize={12}
                   fontColor="#000"
                 />
-              </View>
+              </TouchableOpacity>
 
-              <View style={[styles.taskGroupCard, {}]}>
+              <TouchableOpacity
+                style={[styles.taskGroupCard, tw`rounded-2xl shadow-sm border border-gray-100`]}
+                onPress={() => {
+                  handleGroupTaskNavigate('gym');
+                }}>
                 <View style={{display: 'flex', flexDirection: 'row'}}>
                   <View
                     style={{
@@ -429,10 +560,10 @@ const Home = () => {
                     />
                   </View>
                   <View>
-                    <Text style={styles.taskGroupCardHeadText}>
-                      Office Project
+                    <Text style={styles.taskGroupCardHeadText}>Gym</Text>
+                    <Text style={styles.taskGroupCardParaText}>
+                      {category?.gym?.count || 0} Tasks
                     </Text>
-                    <Text style={styles.taskGroupCardParaText}>23 Tasks</Text>
                   </View>
                 </View>
                 <CircularProgress
@@ -445,41 +576,12 @@ const Home = () => {
                   fontSize={12}
                   fontColor="#000"
                 />
-              </View>
-              <View style={[styles.taskGroupCard, {}]}>
-                <View style={{display: 'flex', flexDirection: 'row'}}>
-                  <View
-                    style={{
-                      backgroundColor: '#ede4ff',
-                      borderRadius: 10,
-                      padding: 7,
-                      marginRight: 10,
-                    }}>
-                    <IconFontAwesome
-                      name="house-chimney-user"
-                      size={30}
-                      color="#9260f4"
-                    />
-                  </View>
-                  <View>
-                    <Text style={styles.taskGroupCardHeadText}>
-                      Personal Project
-                    </Text>
-                    <Text style={styles.taskGroupCardParaText}>30 Tasks</Text>
-                  </View>
-                </View>
-                <CircularProgress
-                  size={50}
-                  percentage={52}
-                  donutColor="#9260f4"
-                  fillColor="#fff"
-                  blankColor="#ede4ff"
-                  progressWidth={22}
-                  fontSize={12}
-                  fontColor="#000"
-                />
-              </View>
-              <View style={[styles.taskGroupCard, {}]}>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.taskGroupCard, tw`rounded-2xl shadow-sm border border-gray-100`]}
+                onPress={() => {
+                  handleGroupTaskNavigate('work');
+                }}>
                 <View style={{display: 'flex', flexDirection: 'row'}}>
                   <View
                     style={{
@@ -495,10 +597,10 @@ const Home = () => {
                     />
                   </View>
                   <View>
-                    <Text style={styles.taskGroupCardHeadText}>
-                      Daily Study
+                    <Text style={styles.taskGroupCardHeadText}>Work</Text>
+                    <Text style={styles.taskGroupCardParaText}>
+                      {category?.work?.count || 0} Tasks
                     </Text>
-                    <Text style={styles.taskGroupCardParaText}>18 Tasks</Text>
                   </View>
                 </View>
                 <CircularProgress
@@ -511,7 +613,44 @@ const Home = () => {
                   fontSize={12}
                   fontColor="#000"
                 />
-              </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.taskGroupCard, tw`rounded-2xl shadow-sm border border-gray-100`]}
+                onPress={() => {
+                  handleGroupTaskNavigate('other');
+                }}>
+                <View style={{display: 'flex', flexDirection: 'row'}}>
+                  <View
+                    style={{
+                      backgroundColor: '#ede4ff',
+                      borderRadius: 10,
+                      padding: 7,
+                      marginRight: 10,
+                    }}>
+                    <IconFontAwesome
+                      name="house-chimney-user"
+                      size={30}
+                      color="#9260f4"
+                    />
+                  </View>
+                  <View>
+                    <Text style={styles.taskGroupCardHeadText}>Others</Text>
+                    <Text style={styles.taskGroupCardParaText}>
+                      {category?.other?.count || 0} Tasks
+                    </Text>
+                  </View>
+                </View>
+                <CircularProgress
+                  size={50}
+                  percentage={52}
+                  donutColor="#9260f4"
+                  fillColor="#fff"
+                  blankColor="#ede4ff"
+                  progressWidth={22}
+                  fontSize={12}
+                  fontColor="#000"
+                />
+              </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
@@ -625,15 +764,11 @@ const styles = StyleSheet.create({
   },
   taskGroupCard: {
     padding: 20,
-    borderRadius: 10,
     width: '100%',
-    shadowColor: '#171717',
-    shadowOffset: {width: -2, height: 4},
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderWidth: 0.2,
     backgroundColor: '#fff',
     marginBottom: 20,
   },
