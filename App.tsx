@@ -18,6 +18,7 @@ import BottomNavbar from './src/components/bottomNavbar';
 import Layout from './src/screens/layout';
 import Profile from './src/screens/profile';
 import AddTask from './src/screens/addTask';
+import TaskList from './src/screens/taskList';
 // Enable react-native-screens for better performance
 enableScreens();
 
@@ -37,6 +38,7 @@ export type RootStackParamList = {
   StartScreen: undefined;
   Layout: undefined;
   AddTask:undefined;
+  TaskList:undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -100,6 +102,11 @@ function AppContent() {
             <Stack.Screen
               name="AddTask"
               component={AddTask}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="TaskList"
+              component={TaskList}
               options={{headerShown: false}}
             />
             

@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {
+  ActivityIndicator,
   Alert,
   Image,
   SafeAreaView,
@@ -46,7 +47,7 @@ const Register = () => {
         email: email,
         password: password,
       });
-      if (response.status === 200) {
+      if (response.status === 201) {
         setLoader(false);
         console.log(response.data);
         setFullName('');
@@ -162,7 +163,7 @@ const Register = () => {
             style={[
               tw`flex w-full flex justify-center items-center bg-[#7563F7] p-4 rounded-xl shadow-md mt-6`,
             ]}>
-            <Text style={[tw`text-white text-center text-xl`]}>Signuping....</Text>
+              <ActivityIndicator size={30} color="#fff" />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity

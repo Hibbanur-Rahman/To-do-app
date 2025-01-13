@@ -8,6 +8,8 @@ import {
   ScrollView,
   TextInput,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -21,7 +23,10 @@ import CalendarIconSvg from '../components/calendarIconSvg';
 import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-
+import tw from 'twrnc';
+import axios from 'axios';
+import API_URL from '../../environmentVariables';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const AddTask = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -33,7 +38,8 @@ const AddTask = () => {
   const [chosenEndDate, setChosenEndDate] = useState(new Date());
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [endDateHeadText, setEndDateHeadText] = useState('Select the date');
-
+  const [taskGroup,setTaskGroup]=useState(null);
+  const [loader, setLoader] = useState(false);
   const handleStartDateChange = (
     event: DateTimePickerEvent,
     selectedDate?: Date,
@@ -77,6 +83,49 @@ const AddTask = () => {
   const showEndDatePickerModal = () => {
     setShowEndDatePicker(true);
   };
+
+  const handleAddTask = async () => {
+    setLoader(true);
+    try {
+      const token = await AsyncStorage.getItem('access_token');
+      const response = await axios.post(
+        `${API_URL}/tasks`,
+        {
+          taskName: projectName,
+          description: projectDescription,
+          completed: false,
+          tags: taskGroup,
+          priority: 'high',
+          startDate: chosenStartDate,
+          endDate: chosenEndDate,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      if (response?.status === 201) {
+        Alert.alert('Task Added Successfully');
+        setProjectName('');
+        setProjectDescription('');
+        setChosenStartDate(new Date());
+        setChosenEndDate(new Date());
+        setShowStartDatePicker(false);
+      }
+    } catch (error) {
+      console.log('error in adding task:', error);
+      Alert?.alert(
+        'Error in Add',
+        `${
+          error?.response?.data?.message ||
+          'Something went wrong while adding task'
+        } `,
+      );
+    } finally {
+      setLoader(false);
+    }
+  };
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -100,8 +149,8 @@ const AddTask = () => {
             <Icon name="bell-fill" size={20} color="#000" />
           </View>
           {/**============= task group drop down ============ */}
-          <View style={{width: '100%', display: 'flex', marginTop: 20}}>
-            <DropdownComponent />
+          <View style={[{width: '100%', display: 'flex', marginTop: 20}, tw``]}>
+            <DropdownComponent value={taskGroup} setValue={setTaskGroup}/>
           </View>
           {/**============= project name input ============ */}
           <View
@@ -114,6 +163,7 @@ const AddTask = () => {
                 padding: 10,
                 paddingStart: 20,
               },
+              tw`rounded-2xl shadow-sm border-gray-500`,
             ]}>
             <Text style={[styles.taskGroupCardParaText, {}]}>Project Name</Text>
             <TextInput
@@ -135,6 +185,7 @@ const AddTask = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
               },
+              tw`rounded-2xl shadow-sm border-gray-500`,
             ]}>
             <Text style={[styles.taskGroupCardParaText, {}]}>Description</Text>
 
@@ -163,9 +214,10 @@ const AddTask = () => {
             style={[
               styles.taskGroupCard,
               {display: 'flex', flexDirection: 'row'},
+              tw`rounded-2xl shadow-sm border-gray-500`,
             ]}>
             <TouchableOpacity
-              onPress={showStartDatePickerModal}
+              onPress={() => showStartDatePickerModal()}
               style={{
                 display: 'flex',
                 flexDirection: 'row',
@@ -200,9 +252,10 @@ const AddTask = () => {
             style={[
               styles.taskGroupCard,
               {display: 'flex', flexDirection: 'row'},
+              tw`rounded-2xl shadow-sm border-gray-500`,
             ]}>
             <TouchableOpacity
-              onPress={showEndDatePickerModal}
+              onPress={() => showEndDatePickerModal()}
               style={{
                 display: 'flex',
                 flexDirection: 'row',
@@ -236,9 +289,17 @@ const AddTask = () => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <TouchableOpacity style={styles.addProjectButton}>
-              <Text style={styles.addProjectButtonText}>Add Project</Text>
-            </TouchableOpacity>
+            {loader ? (
+              <TouchableOpacity style={styles.addProjectButton}>
+                <ActivityIndicator size={30} color={'#fff'} />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.addProjectButton}
+                onPress={handleAddTask}>
+                <Text style={styles.addProjectButtonText}>Add Project</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </ScrollView>
       </ImageBackground>

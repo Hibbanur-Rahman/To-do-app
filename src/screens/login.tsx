@@ -8,6 +8,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
   View,
 } from 'react-native';
 import tw from 'twrnc';
@@ -46,10 +47,10 @@ const Login = () => {
       if (response.status === 200) {
         setLoader(false);
         console.log(response.data);
-        const userJson = JSON.stringify(response.data.data.User); // Convert the user object to a JSON string
+        const userJson = JSON.stringify(response.data?.data?.user); // Convert the user object to a JSON string
         await AsyncStorage.setItem('user', userJson);
-        await AsyncStorage.setItem('access_token', response.data.data.token);
-        await AsyncStorage.setItem('username', response.data.data.User.username);
+        await AsyncStorage.setItem('access_token', response.data?.data?.access_token);
+        await AsyncStorage.setItem('username', response.data?.data?.user?.username);
         dispatch(handleIsAuthenticated({isAuthenticated: true}));
         navigation.navigate('Layout');
       }
@@ -73,7 +74,9 @@ const Login = () => {
     }
   });
   return (
-    <View style={[tw`w-full h-full bg-white flex `]}>
+    <View style={[tw`w-full h-full bg-white flex `,{
+      fontFamily:'LexendDeca-Regular',
+    }]}>
       <ScrollView
         style={[tw`h-full w-full py-4 px-3`,{flex:1}]}
         showsVerticalScrollIndicator={false}>
@@ -81,7 +84,9 @@ const Login = () => {
           <Image source={require('../assets/images/logo.png')} style={[tw`h-[100px] w-[80px]`]} />
           <Text style={[tw`text-lg font-bold`]}>To-Do</Text>
         </View>
-        <Text style={[tw`text-center text-3xl font-bold mt-5`]}>
+        <Text style={[tw`text-center text-3xl font-bold mt-5`,{
+      fontFamily:'LexendDeca-Regular',
+    }]}>
           Welcome Back!
         </Text>
         <Text style={[tw`text-center mt-2 text-lg text-gray-400`]}>
@@ -142,9 +147,8 @@ const Login = () => {
             style={[
               tw`flex w-full flex justify-center items-center bg-[#7563F7] p-4 rounded-xl shadow-md mt-6`,
             ]}>
-            <Text style={[tw`text-white text-center text-xl`]}>
-              Logining...
-            </Text>
+           
+            <ActivityIndicator size={30} color='#fff'/>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity

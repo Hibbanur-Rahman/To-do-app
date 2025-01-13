@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  StyleSheet,
+  ImageBackground,
 } from 'react-native';
 import tw from 'twrnc';
 import {useNavigation} from '@react-navigation/native';
@@ -23,7 +25,10 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useEffect, useState} from 'react';
-
+import ArrowLeftSvg from '../components/arrowLeftSvg';
+import Icon from 'react-native-vector-icons/Octicons';
+import IconIntypo from 'react-native-vector-icons/Entypo';
+import IconFontAwesome from 'react-native-vector-icons/FontAwesome6';
 interface User {
   username: string;
   email: string;
@@ -62,194 +67,283 @@ const Profile = () => {
   }, []);
 
   return (
-    <SafeAreaView style={tw`bg-[#fff] h-full w-full`}>
-      <ScrollView
-        style={tw`w-full h-full bg-white`}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}>
-        <View style={tw`bg-[#7563F7] px-4 py-3`}>
-          <View style={tw`w-full flex-row justify-between items-center`}>
-            <AntDesign
-              name="arrowleft"
-              size={30}
-              color={'#fff'}
-              onPress={() => navigation.goBack()} // Navigate back
-            />
+    <View style={styles.container}>
+      <ImageBackground
+        source={require('../assets/images/backgound-img.png')}
+        style={styles.backgroundImg}
+        resizeMode="cover">
+        <ScrollView style={{padding: 15}} showsVerticalScrollIndicator={false}>
+          {/**============ navbar ============= */}
+          <View style={styles.navbar}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <ArrowLeftSvg />
+            </TouchableOpacity>
             <Text
-              style={tw`text-center w-11/12 text-lg font-semibold text-white`}>
-              PROFILES
+              style={{
+                fontFamily: 'LexendDeca-Bold',
+                color: '#000',
+                fontSize: 20,
+              }}>
+              Profile
             </Text>
+            <MaterialIcons name="bell-fill" size={20} color="#000" />
+          </View>
+
+          <View
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: 20,
+            }}>
+            <Image
+              source={require('../assets/images/profile-img.png')}
+              style={styles.profileImg}
+            />
+            <Text style={[styles.headText, {marginTop: 15, marginBottom: 5}]}>
+              {user?.username}
+            </Text>
+            <Text style={[styles.paraText, {}]}>{user?.email}</Text>
           </View>
           <View
-            style={tw`flex flex-row items-center  mt-4 w-full relative py-6`}>
-            <View style={tw`border border-white p-1 rounded-full`}>
-              {/* <Image
-                source={require('../assets/images/profile.png')}
-                style={tw`h-[80px] w-[80px] rounded-full border-[3px] border-white`}
-              /> */}
-            </View>
-            <View style={tw`ml-4`}>
-              <Text style={tw`text-white text-xl font-bold`}>
-                {user?.username || 'Guest User'}
-              </Text>
-              <Text style={tw`text-white text-sm`}>
-                {user?.email || 'No email provided'}
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={[tw`right-0 absolute`]}
-              onPress={() => navigation.navigate('EditProfile')}>
-              <FontAwesome name="edit" size={30} color="#fff" />
+            style={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity style={styles.editProfileButton}>
+              <Text style={styles.editProfileButtonText}>Edit Profile</Text>
             </TouchableOpacity>
           </View>
-        </View>
-
-        <View style={[tw`px-3`]}>
           <TouchableOpacity
             style={[
-              tw`flex flex-row border border-l-0 border-r-0 border-t-0 border-gray-300 p-3 items-center gap-[10px]`,
+              ,
+              {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexDirection: 'row',
+                marginTop: 40,
+                borderTopWidth: 0.5,
+                paddingVertical: 10,
+                borderBottomWidth: 0.5,
+                borderColor: '#BEBEC3',
+              },
             ]}>
-            <View style={[tw`w-[40px] flex-row justify-center items-center`]}>
-              <Feather name="box" size={30} style={[tw`text-gray-700`]} />
+            <View
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                flexDirection: 'row',
+                width: 'auto',
+              }}>
+              <View
+                style={{
+                  backgroundColor: '#f6f7f7',
+                  padding: 8,
+                  borderRadius: 30,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <IconFontAwesome name="headset" size={25} color="#000" />
+              </View>
+              <Text style={[styles.headText, {fontSize: 16, marginStart: 10}]}>
+                Help Center
+              </Text>
             </View>
-            <Text style={[tw`text-lg text-gray-700`]}>My Orders</Text>
+            <IconFontAwesome name="chevron-right" size={20} color="#000" />
           </TouchableOpacity>
           <TouchableOpacity
             style={[
-              tw`flex flex-row border border-l-0 border-r-0 border-t-0 border-gray-300 p-3 items-center gap-[10px]`,
+              ,
+              {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexDirection: 'row',
+                borderTopWidth: 0.5,
+                paddingVertical: 10,
+                borderBottomWidth: 0.5,
+                borderColor: '#BEBEC3',
+              },
             ]}>
-            <View style={[tw`w-[40px] flex-row justify-center items-center`]}>
-              <Octicons
-                name="checklist"
-                size={30}
-                style={[tw`text-gray-700`]}
-              />
+            <View
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                flexDirection: 'row',
+                width: 'auto',
+              }}>
+              <View
+                style={{
+                  backgroundColor: '#f6f7f7',
+                  padding: 8,
+                  borderRadius: 30,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <IconFontAwesome name="star" size={25} color="#000" />
+              </View>
+              <Text style={[styles.headText, {fontSize: 16, marginStart: 10}]}>
+                Rate the App
+              </Text>
             </View>
-            <Text style={[tw`text-lg text-gray-700`]}>My Wishlist</Text>
+            <IconFontAwesome name="chevron-right" size={20} color="#000" />
           </TouchableOpacity>
           <TouchableOpacity
             style={[
-              tw`flex flex-row border border-l-0 border-r-0 border-t-0 border-gray-300 p-3 items-center gap-[10px]`,
+              ,
+              {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexDirection: 'row',
+                borderTopWidth: 0.5,
+                paddingVertical: 10,
+                borderBottomWidth: 0.5,
+                borderColor: '#BEBEC3',
+              },
             ]}>
-            <View style={[tw`w-[40px] flex-row justify-center items-center`]}>
-              <Foundation
-                name="clipboard-notes"
-                size={30}
-                style={[tw`text-gray-700`]}
-              />
+            <View
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                flexDirection: 'row',
+                width: 'auto',
+              }}>
+              <View
+                style={{
+                  backgroundColor: '#f6f7f7',
+                  padding: 8,
+                  borderRadius: 30,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <IconFontAwesome name="eye" size={25} color="#000" />
+              </View>
+              <Text style={[styles.headText, {fontSize: 16, marginStart: 10}]}>
+                Privacy Policy
+              </Text>
             </View>
-            <Text style={[tw`text-lg text-gray-700`]}>My Prescription</Text>
+            <IconFontAwesome name="chevron-right" size={20} color="#000" />
           </TouchableOpacity>
           <TouchableOpacity
+            onPress={handleLogout}
             style={[
-              tw`flex flex-row border border-l-0 border-r-0 border-t-0 border-gray-300 p-3 items-center gap-[10px]`,
+              ,
+              {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexDirection: 'row',
+                borderTopWidth: 0.5,
+                paddingVertical: 10,
+                borderBottomWidth: 0.5,
+                borderColor: '#BEBEC3',
+              },
             ]}>
-            <View style={[tw`w-[40px] flex-row justify-center items-center`]}>
-              <AntDesign name="home" size={30} style={[tw`text-gray-700`]} />
+            <View
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                flexDirection: 'row',
+                width: 'auto',
+              }}>
+              <View
+                style={{
+                  backgroundColor: '#f6f7f7',
+                  padding: 8,
+                  borderRadius: 30,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <IconFontAwesome
+                  name="arrow-right-from-bracket"
+                  size={25}
+                  color="#ff7f74"
+                />
+              </View>
+              <Text
+                style={[
+                  styles.headText,
+                  {fontSize: 16, marginStart: 10, color: '#ff7f74'},
+                ]}>
+                Log Out
+              </Text>
             </View>
-            <Text style={[tw`text-lg text-gray-700`]}>Addresses</Text>
+            <IconFontAwesome name="chevron-right" size={20} color="#000" />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              tw`flex flex-row border border-l-0 border-r-0 border-t-0 border-gray-300 p-3 items-center gap-[10px]`,
-            ]}>
-            <View style={[tw`w-[40px] flex-row justify-center items-center`]}>
-              <Octicons
-                name="credit-card"
-                size={30}
-                style={[tw`text-gray-700`]}
-              />
-            </View>
-            <Text style={[tw`text-lg text-gray-700`]}>Subscription</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              tw`flex flex-row border border-l-0 border-r-0 border-t-0 border-gray-300 p-3 items-center gap-[10px]`,
-            ]}>
-            <View style={[tw`w-[40px] flex-row justify-center items-center`]}>
-              <MaterialCommunityIcons
-                name="account-multiple-plus-outline"
-                size={30}
-                style={[tw`text-gray-700`]}
-              />
-            </View>
-            <Text style={[tw`text-lg text-gray-700`]}>Invite Friends</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              tw`flex flex-row border border-l-0 border-r-0 border-t-0 border-gray-300 p-3 items-center gap-[10px]`,
-            ]}
-            onPress={() => navigation.navigate('TermsAndCondition')}>
-            <View style={[tw`w-[40px] flex-row justify-center items-center`]}>
-              <MaterialIcons
-                name="security"
-                size={30}
-                style={[tw`text-gray-700`]}
-              />
-            </View>
-            <Text style={[tw`text-lg text-gray-700`]}>Terms Of Service</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              tw`flex flex-row border border-l-0 border-r-0 border-t-0 border-gray-300 p-3 items-center gap-[10px]`,
-            ]}
-            onPress={() => navigation.navigate('PrivacyPolicy')}>
-            <View style={[tw`w-[40px] flex-row justify-center items-center`]}>
-              <MaterialCommunityIcons
-                name="shield-account-variant-outline"
-                size={30}
-                style={[tw`text-gray-700`]}
-              />
-            </View>
-            <Text style={[tw`text-lg text-gray-700`]}>Privacy Policy</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              tw`flex flex-row border border-l-0 border-r-0 border-t-0 border-gray-300 p-3 items-center gap-[10px]`,
-            ]}>
-            <View style={[tw`w-[40px] flex-row justify-center items-center`]}>
-              <FontAwesome
-                name="support"
-                size={30}
-                style={[tw`text-gray-700`]}
-              />
-            </View>
-            <Text style={[tw`text-lg text-gray-700`]}>
-              Frequently Asked Questions
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              tw`flex flex-row border border-l-0 border-r-0 border-t-0 border-gray-300 p-3 items-center gap-[10px]`,
-            ]}>
-            <View style={[tw`w-[40px] flex-row justify-center items-center`]}>
-              <Entypo name="globe" size={30} style={[tw`text-gray-700`]} />
-            </View>
-            <Text style={[tw`text-lg text-gray-700`]}>Language</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              tw`flex flex-row  border-gray-300 p-3 items-center gap-[10px]`,
-            ]}
-            onPress={handleLogout}>
-            <View style={[tw`w-[40px] flex-row justify-center items-center`]}>
-              <MaterialIcons
-                name="logout"
-                size={30}
-                style={[tw`text-gray-700`]}
-              />
-            </View>
-            <Text style={[tw`text-lg text-gray-700`]}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-        {/* <TouchableOpacity
-          onPress={handleLogout}
-          style={tw`w-full py-4 mt-6 rounded-xl bg-[#FF3951] flex justify-center items-center`}>
-          <Text style={tw`text-white text-xl`}>Logout</Text>
-        </TouchableOpacity> */}
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+       
+      </ImageBackground>
+    </View>
   );
 };
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  backgroundImg: {
+    flex: 1,
+  },
+  navbar: {
+    height: 50,
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  profileImg: {
+    height: 100,
+    width: 100,
+    borderRadius: 50,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#000',
+    elevation: 10, // Android shadow
+    shadowColor: '#000', // iOS shadow
+    shadowOffset: {width: 30, height: 40}, // iOS shadow
+    shadowOpacity: 1, // iOS shadow
+    shadowRadius: 10, // iOS shadow
+  },
+  headText: {
+    fontSize: 20,
+    color: '#000',
+    fontFamily: 'LexendDeca-Medium',
+    textAlign: 'center',
+  },
+  paraText: {
+    fontSize: 13,
+    fontFamily: 'LexendDeca-Regular',
+    textAlign: 'center',
+    width: '100%',
+    color: '#726e80',
+  },
+  editProfileButton: {
+    backgroundColor: '#5F33E1',
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+    paddingTop: 15,
+    paddingBottom: 15,
+    marginTop: 20,
+  },
+  editProfileButtonText: {
+    color: '#FFF',
+    fontSize: 19,
+    fontFamily: 'LexendDeca-SemiBold',
+    width: '100%',
+    textAlign: 'center',
+  },
+});
 
 export default Profile;

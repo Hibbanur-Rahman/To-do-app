@@ -75,7 +75,6 @@ const Home = () => {
                   name="view-dashboard-outline"
                   style={[tw`text-2xl text-white`]}
                 />
-               
               </View>
               <View style={[tw`relative w-9/12 flex flex-row items-center`]}>
                 <EvilIcons
@@ -93,12 +92,12 @@ const Home = () => {
               </View>
             </View>
             <View>
-            <Text style={[styles.navbarTextPara, tw`text-white`]}>
-                  Hello!
-                </Text>
-                <Text style={[styles.navbarProfileName, tw`text-white`]}>
-                  {username}
-                </Text>
+              <Text style={[styles.navbarTextPara, tw`text-white`]}>
+                Hello!
+              </Text>
+              <Text style={[styles.navbarProfileName, tw`text-white`]}>
+                {username}
+              </Text>
             </View>
           </View>
           <View style={{padding: 15}}>
@@ -314,7 +313,7 @@ const Home = () => {
             {/** =============== Task Groups section ============== */}
             <View>
               <Text style={styles.progressHeadText}>Task Groups</Text>
-              <View style={[styles.taskGroupCard, {}]}>
+              <TouchableOpacity style={[styles.taskGroupCard, {}]}   onPress={() => navigation.navigate('TaskList')}>
                 <View style={{display: 'flex', flexDirection: 'row'}}>
                   <View
                     style={{
@@ -346,7 +345,7 @@ const Home = () => {
                   fontSize={12}
                   fontColor="#000"
                 />
-              </View>
+              </TouchableOpacity>
               <View style={[styles.taskGroupCard, {}]}>
                 <View style={{display: 'flex', flexDirection: 'row'}}>
                   <View
